@@ -6,6 +6,8 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 from io import BytesIO
 import warnings
+import time
+
 warnings.filterwarnings('ignore')
 
 
@@ -206,6 +208,41 @@ st.markdown("""
 
 
 # ============================================================
+# SIDEBAR - KONTROL DASHBOARD
+# ============================================================
+
+with st.sidebar:
+    st.markdown("## ⚙️ Kontrol Dashboard")
+    
+    col_s1, col_s2 = st.columns(2)
+    
+    with col_s1:
+        if st.button("🔄 Refresh", use_container_width=True):
+            st.rerun()
+    
+    with col_s2:
+        if st.button("🗑️ Clear Cache", use_container_width=True):
+            st.cache_data.clear()
+            st.cache_resource.clear()
+            st.success("✅ Cache cleared!")
+            time.sleep(0.5)
+            st.rerun()
+    
+    st.markdown("---")
+    
+    auto_refresh = st.checkbox("⏰ Auto Refresh (30 detik)")
+    if auto_refresh:
+        placeholder = st.empty()
+        for i in range(30, 0, -1):
+            placeholder.info(f"⏳ Refresh dalam {i} detik...")
+            time.sleep(1)
+        st.rerun()
+    
+    st.caption("📌 Refresh untuk update data")
+    st.caption("🗑️ Clear cache jika ada perubahan model")
+
+
+# ============================================================
 # LOAD MODEL
 # ============================================================
 
@@ -263,6 +300,63 @@ for col in all_attrs:
 def format_attribute_name(attr):
     label = attr.replace('-', ' ').replace('                                                         ', '').replace('skill(CONFIDENCE)', '').replace('ratesoft', 'Rate Soft').replace('ratelife', 'Rate Life').replace('ratetech', 'Rate Tech')
     return label.title()
+
+
+# ============================================================
+# DICTIONARY PENJELASAN ATRIBUT
+# ============================================================
+
+def get_attribute_description(attr):
+    """Mengembalikan deskripsi singkat tentang apa yang dinilai dari atribut"""
+    attr_lower = attr.lower()
+    
+    descriptions = {
+        'decision': "Kemampuan mengambil keputusan secara tepat dan cepat",
+        'planning': "Kemampuan merencanakan tugas dan pekerjaan",
+        'teamwork': "Kemampuan bekerja sama dalam tim",
+        'confident': "Kepercayaan diri dalam menyampaikan pendapat",
+        'meet': "Kemampuan memenuhi tenggat waktu",
+        'stress': "Kemampuan menghadapi situasi penuh tekanan",
+        'communicate': "Kemampuan berkomunikasi secara efektif",
+        'boosting': "Kemampuan mengembangkan kreativitas",
+        'multitask': "Kemampuan mengerjakan beberapa tugas sekaligus",
+        'working': "Kemampuan bekerja secara mandiri",
+        'opinion': "Keberanian menyampaikan pendapat berbeda",
+        'resolve': "Kemampuan menyelesaikan konflik",
+        'convey': "Kemampuan menyampaikan informasi yang tidak populer",
+        'alone': "Kemampuan bekerja tanpa pengawasan",
+        'rearranging': "Kemampuan menyesuaikan jadwal berubah",
+        'inspiration': "Kemampuan mendapatkan inspirasi baru",
+        'motivation': "Tingkat motivasi dalam bekerja",
+        'emotional': "Kemampuan mengelola emosi",
+        'demonstrator': "Kemampuan mendemonstrasikan keterampilan",
+        'good leader': "Kemampuan memimpin tim",
+        'good listener': "Kemampuan mendengarkan orang lain",
+        'oral': "Kemampuan komunikasi lisan",
+        'team building': "Kemampuan membangun tim",
+        'area of interest': "Kejelasan bidang minat",
+        'good presenter': "Kemampuan presentasi",
+        'coach': "Kemampuan membimbing orang lain",
+        'interpersonal': "Kemampuan hubungan interpersonal",
+        'time management': "Kemampuan mengelola waktu",
+        'quality management': "Kemampuan menjaga kualitas kerja",
+        'blend': "Kemampuan menggabungkan skill teknis & manajemen",
+        'gain': "Kemampuan menambah pengetahuan baru",
+        'new hands-on': "Kemampuan belajar alat/praktik baru",
+        'group project': "Kemampuan dalam proyek kelompok",
+        'developing projects': "Kemampuan mengembangkan proyek",
+        'cost/time': "Kemampuan mengelola biaya dan waktu",
+        'administrative': "Kemampuan tugas administratif",
+        'ratesoft': "Penilaian umum terhadap Soft Skills",
+        'ratelife': "Penilaian umum terhadap Life Skills",
+        'ratetech': "Penilaian umum terhadap Technical Skills"
+    }
+    
+    for keyword, description in descriptions.items():
+        if keyword in attr_lower:
+            return description
+    
+    return "Kemampuan terkait atribut ini dalam konteks kesiapan kerja"
 
 
 # ============================================================
@@ -371,7 +465,7 @@ tab1, tab2 = st.tabs(["📝 Input Manual", "📊 Input Excel"])
 
 
 # ============================================================
-# TAB 1 - INPUT MANUAL (DENGAN DATA MAHASISWA)
+# TAB 1 - INPUT MANUAL
 # ============================================================
 
 with tab1:
@@ -412,6 +506,23 @@ with tab1:
     st.markdown("---")
     
     # ========================================
+    # PANDUAN SKALA PENILAIAN
+    # ========================================
+    with st.expander("📖 Panduan Skala Penilaian (0-5)", expanded=False):
+        st.markdown("""
+        | Skor | Keterangan | Deskripsi |
+        |------|------------|-----------|
+        | **0** | Sangat Rendah | Tidak memiliki kemampuan sama sekali |
+        | **1** | Rendah | Masih sangat kurang, perlu banyak latihan |
+        | **2** | Cukup | Mulai bisa, tapi masih perlu peningkatan |
+        | **3** | Sedang | Sudah cukup baik, masih bisa ditingkatkan |
+        | **4** | Baik | Kemampuan sudah baik dan dapat diandalkan |
+        | **5** | Sangat Baik | Kemampuan sangat unggul dan profesional |
+        
+        💡 **Arahkan kursor ke nama atribut** untuk melihat penjelasan detailnya.
+        """)
+    
+    # ========================================
     # INPUT SKILLS
     # ========================================
     col1, col2 = st.columns(2)
@@ -419,20 +530,41 @@ with tab1:
 
     with col1:
         st.subheader(f"🧠 Soft Skills ({len(soft_attrs)} atribut)")
+        st.caption("💡 Arahkan kursor ke nama atribut untuk melihat penjelasan")
         for attr in soft_attrs:
             label = format_attribute_name(attr)
-            input_data[attr] = st.slider(label, 0, 5, 2, key=f"soft_{attr}")
+            description = get_attribute_description(attr)
+            input_data[attr] = st.slider(
+                label, 
+                0, 5, 2, 
+                key=f"soft_{attr}",
+                help=f"📌 {description}\n\nSkala:\n0 = Sangat Rendah\n1 = Rendah\n2 = Cukup\n3 = Sedang\n4 = Baik\n5 = Sangat Baik"
+            )
 
     with col2:
         st.subheader(f"💪 Life Skills ({len(life_attrs)} atribut)")
+        st.caption("💡 Arahkan kursor ke nama atribut untuk melihat penjelasan")
         for attr in life_attrs:
             label = format_attribute_name(attr)
-            input_data[attr] = st.slider(label, 0, 5, 2, key=f"life_{attr}")
+            description = get_attribute_description(attr)
+            input_data[attr] = st.slider(
+                label, 
+                0, 5, 2, 
+                key=f"life_{attr}",
+                help=f"📌 {description}\n\nSkala:\n0 = Sangat Rendah\n1 = Rendah\n2 = Cukup\n3 = Sedang\n4 = Baik\n5 = Sangat Baik"
+            )
         
         st.subheader(f"🛠️ Technical Skills ({len(tech_attrs)} atribut)")
+        st.caption("💡 Arahkan kursor ke nama atribut untuk melihat penjelasan")
         for attr in tech_attrs:
             label = format_attribute_name(attr)
-            input_data[attr] = st.slider(label, 0, 5, 2, key=f"tech_{attr}")
+            description = get_attribute_description(attr)
+            input_data[attr] = st.slider(
+                label, 
+                0, 5, 2, 
+                key=f"tech_{attr}",
+                help=f"📌 {description}\n\nSkala:\n0 = Sangat Rendah\n1 = Rendah\n2 = Cukup\n3 = Sedang\n4 = Baik\n5 = Sangat Baik"
+            )
 
     # ========================================
     # BUTTON PREDIKSI
