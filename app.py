@@ -6,14 +6,10 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 from io import BytesIO
 import warnings
-import time
 
 warnings.filterwarnings('ignore')
 
 
-# ============================================================
-# KONFIGURASI HALAMAN
-# ============================================================
 
 st.set_page_config(
     page_title="Prediksi Kesiapan Kerja Mahasiswa",
@@ -22,9 +18,6 @@ st.set_page_config(
 )
 
 
-# ============================================================
-# CSS CUSTOM
-# ============================================================
 
 st.markdown("""
 <style>
@@ -195,9 +188,6 @@ st.markdown("""
 """, unsafe_allow_html=True)
 
 
-# ============================================================
-# HEADER
-# ============================================================
 
 st.markdown("""
 <div class="main-header">
@@ -207,44 +197,6 @@ st.markdown("""
 """, unsafe_allow_html=True)
 
 
-# ============================================================
-# SIDEBAR - KONTROL DASHBOARD
-# ============================================================
-
-with st.sidebar:
-    st.markdown("## ⚙️ Kontrol Dashboard")
-    
-    col_s1, col_s2 = st.columns(2)
-    
-    with col_s1:
-        if st.button("🔄 Refresh", use_container_width=True):
-            st.rerun()
-    
-    with col_s2:
-        if st.button("🗑️ Clear Cache", use_container_width=True):
-            st.cache_data.clear()
-            st.cache_resource.clear()
-            st.success("✅ Cache cleared!")
-            time.sleep(0.5)
-            st.rerun()
-    
-    st.markdown("---")
-    
-    auto_refresh = st.checkbox("⏰ Auto Refresh (30 detik)")
-    if auto_refresh:
-        placeholder = st.empty()
-        for i in range(30, 0, -1):
-            placeholder.info(f"⏳ Refresh dalam {i} detik...")
-            time.sleep(1)
-        st.rerun()
-    
-    st.caption("📌 Refresh untuk update data")
-    st.caption("🗑️ Clear cache jika ada perubahan model")
-
-
-# ============================================================
-# LOAD MODEL
-# ============================================================
 
 @st.cache_resource
 def load_model():
@@ -261,9 +213,6 @@ except FileNotFoundError:
     st.stop()
 
 
-# ============================================================
-# BAGI FITUR PER KELOMPOK
-# ============================================================
 
 soft_attrs = []
 life_attrs = []
@@ -293,21 +242,16 @@ for col in all_attrs:
         soft_attrs.append(col)
 
 
-# ============================================================
-# FUNGSI FORMAT NAMA ATRIBUT
-# ============================================================
 
 def format_attribute_name(attr):
     label = attr.replace('-', ' ').replace('                                                         ', '').replace('skill(CONFIDENCE)', '').replace('ratesoft', 'Rate Soft').replace('ratelife', 'Rate Life').replace('ratetech', 'Rate Tech')
     return label.title()
 
 
-# ============================================================
-# DICTIONARY PENJELASAN ATRIBUT
-# ============================================================
+
 
 def get_attribute_description(attr):
-    """Mengembalikan deskripsi singkat tentang apa yang dinilai dari atribut"""
+    """Mengembalikan penjelasan dalam bahasa Indonesia untuk setiap atribut"""
     attr_lower = attr.lower()
     
     descriptions = {
@@ -325,7 +269,7 @@ def get_attribute_description(attr):
         'resolve': "Kemampuan menyelesaikan konflik",
         'convey': "Kemampuan menyampaikan informasi yang tidak populer",
         'alone': "Kemampuan bekerja tanpa pengawasan",
-        'rearranging': "Kemampuan menyesuaikan jadwal berubah",
+        'rearranging': "Kemampuan menyesuaikan jadwal yang berubah",
         'inspiration': "Kemampuan mendapatkan inspirasi baru",
         'motivation': "Tingkat motivasi dalam bekerja",
         'emotional': "Kemampuan mengelola emosi",
@@ -359,9 +303,6 @@ def get_attribute_description(attr):
     return "Kemampuan terkait atribut ini dalam konteks kesiapan kerja"
 
 
-# ============================================================
-# FUNGSI SARAN PENGEMBANGAN
-# ============================================================
 
 def get_suggestion(attr):
     attr_lower = attr.lower()
@@ -409,9 +350,7 @@ def get_suggestion(attr):
     return "Tingkatkan atribut ini melalui latihan rutin, pengalaman praktik, kegiatan kelompok, pelatihan, serta evaluasi perkembangan secara berkala."
 
 
-# ============================================================
-# TEMPLATE EXCEL
-# ============================================================
+
 
 def create_template():
     df_template = pd.DataFrame(columns=all_attrs + ['Nama_Mahasiswa', 'NIM', 'Umur', 'Jurusan'])
@@ -422,9 +361,7 @@ def create_template():
     return output.getvalue()
 
 
-# ============================================================
-# FUNGSI PREDIKSI
-# ============================================================
+
 
 def predict_single(input_data):
     df_input = pd.DataFrame([input_data])
@@ -457,23 +394,17 @@ def get_feature_importance():
     }
 
 
-# ============================================================
-# TAB INPUT
-# ============================================================
+
 
 tab1, tab2 = st.tabs(["📝 Input Manual", "📊 Input Excel"])
 
 
-# ============================================================
-# TAB 1 - INPUT MANUAL
-# ============================================================
+
 
 with tab1:
     st.markdown('<p class="section-title">📝 Input Data Mahasiswa</p>', unsafe_allow_html=True)
     
-    # ========================================
-    # FORM DATA MAHASISWA
-    # ========================================
+   
     with st.container():
         st.markdown("### 👤 Data Diri Mahasiswa")
         col_n1, col_n2, col_n3, col_n4 = st.columns(4)
@@ -505,9 +436,7 @@ with tab1:
     
     st.markdown("---")
     
-    # ========================================
-    # PANDUAN SKALA PENILAIAN
-    # ========================================
+
     with st.expander("📖 Panduan Skala Penilaian (0-5)", expanded=False):
         st.markdown("""
         | Skor | Keterangan | Deskripsi |
@@ -518,13 +447,9 @@ with tab1:
         | **3** | Sedang | Sudah cukup baik, masih bisa ditingkatkan |
         | **4** | Baik | Kemampuan sudah baik dan dapat diandalkan |
         | **5** | Sangat Baik | Kemampuan sangat unggul dan profesional |
-        
-        💡 **Arahkan kursor ke nama atribut** untuk melihat penjelasan detailnya.
         """)
     
-    # ========================================
-    # INPUT SKILLS
-    # ========================================
+  
     col1, col2 = st.columns(2)
     input_data = {}
 
@@ -566,18 +491,13 @@ with tab1:
                 help=f"📌 {description}\n\nSkala:\n0 = Sangat Rendah\n1 = Rendah\n2 = Cukup\n3 = Sedang\n4 = Baik\n5 = Sangat Baik"
             )
 
-    # ========================================
-    # BUTTON PREDIKSI
-    # ========================================
     col_btn1, col_btn2, col_btn3 = st.columns([1, 2, 1])
     with col_btn2:
         predict_manual = st.button("🔮 Prediksi Kesiapan Kerja", type="primary", use_container_width=True)
 
-    # ========================================
-    # HASIL PREDIKSI MANUAL
-    # ========================================
+    
     if predict_manual:
-        # Validasi input nama
+       
         if not nama_mahasiswa.strip():
             st.warning("⚠️ Silakan masukkan Nama Mahasiswa terlebih dahulu!")
             st.stop()
@@ -595,9 +515,7 @@ with tab1:
 
         st.markdown("---")
         
-        # ========================================
-        # INFO MAHASISWA
-        # ========================================
+      
         st.markdown("### 👤 Informasi Mahasiswa")
         st.markdown(f"""
         <div class="student-info-card">
@@ -618,9 +536,7 @@ with tab1:
         </div>
         """, unsafe_allow_html=True)
 
-        # ========================================
-        # STATUS PREDIKSI
-        # ========================================
+      
         if prediction == 1:
             st.markdown(
                 f"""
@@ -644,9 +560,7 @@ with tab1:
                 unsafe_allow_html=True
             )
 
-        # ========================================
-        # SCORE CARD
-        # ========================================
+     
         col_m1, col_m2, col_m3 = st.columns(3)
         with col_m1:
             st.markdown(
@@ -679,9 +593,7 @@ with tab1:
                 unsafe_allow_html=True
             )
 
-        # ========================================
-        # GRAFIK
-        # ========================================
+      
         col_g1, col_g2 = st.columns(2)
 
         with col_g1:
@@ -716,9 +628,7 @@ with tab1:
             st.pyplot(fig)
             plt.close()
 
-        # ========================================
-        # ANALISIS DAN REKOMENDASI
-        # ========================================
+        
         st.markdown('<p class="section-title">📋 Analisis dan Rekomendasi Pengembangan</p>', unsafe_allow_html=True)
         st.info("🔴 Skor 0–2 = Perlu Ditingkatkan  |  🟡 Skor 3 = Cukup  |  🟢 Skor 4–5 = Perlu Dipertahankan")
 
@@ -766,9 +676,7 @@ with tab1:
             else:
                 st.info("ℹ️ Belum terdapat atribut dengan skor ≥ 4. Fokus utama adalah meningkatkan atribut dengan skor rendah.")
 
-        # ========================================
-        # PRIORITAS
-        # ========================================
+        
         if low_attrs:
             st.markdown("### 🎯 Prioritas Pengembangan")
             priority_attr = low_attrs[0]
@@ -777,9 +685,7 @@ with tab1:
             priority_suggestion = get_suggestion(priority_attr[0])
             st.warning(f"**{nama_mahasiswa}** - Prioritas utama adalah **{priority_name}** dengan skor **{priority_score}**. {priority_suggestion}")
 
-        # ========================================
-        # DETAIL SKOR
-        # ========================================
+        
         st.markdown('<p class="section-title">📊 Detail Skor per Atribut</p>', unsafe_allow_html=True)
         tab_soft, tab_life, tab_tech = st.tabs(["🧠 Soft Skills", "💪 Life Skills", "🛠️ Technical Skills"])
 
@@ -826,9 +732,6 @@ with tab1:
             plt.close()
 
 
-# ============================================================
-# TAB 2 - INPUT EXCEL
-# ============================================================
 
 with tab2:
     st.markdown('<p class="section-title">📊 Upload Data Excel</p>', unsafe_allow_html=True)
@@ -871,9 +774,7 @@ with tab2:
                         df_batch['Prediksi'] = ['Siap Kerja' if p == 1 else 'Belum Siap' for p in predictions]
                         df_batch['Probabilitas'] = probabilities
 
-                    # ========================================
-                    # 1. HASIL PREDIKSI KESIAPAN KERJA
-                    # ========================================
+                    
                     st.markdown('<p class="section-title">📊 Hasil Prediksi Kesiapan Kerja</p>', unsafe_allow_html=True)
                     
                     total = len(df_batch)
@@ -888,9 +789,7 @@ with tab2:
                     with col_c3:
                         st.metric("❌ Belum Siap", f"{belum} ({belum / total * 100:.1f}%)")
 
-                    # ========================================
-                    # 2. PERBANDINGAN DENGAN DATASET PUBLIK
-                    # ========================================
+                   
                     st.markdown('<p class="section-title">📈 Perbandingan dengan Dataset Publik (Mendeley)</p>', unsafe_allow_html=True)
                     
                     publik_siap = 28.8
@@ -906,9 +805,7 @@ with tab2:
                     with col_comp3:
                         st.metric("Belum Siap", f"{privat_belum:.1f}%", delta=f"{privat_belum - publik_belum:+.1f}%")
 
-                    # ========================================
-                    # 3. GRAFIK DISTRIBUSI
-                    # ========================================
+                    
                     st.markdown('<p class="section-title">📊 Distribusi Hasil Prediksi</p>', unsafe_allow_html=True)
                     
                     fig, axes = plt.subplots(1, 2, figsize=(12, 4))
@@ -929,9 +826,7 @@ with tab2:
                     st.pyplot(fig)
                     plt.close()
 
-                    # ========================================
-                    # 4. DISTRIBUSI PROBABILITAS
-                    # ========================================
+            
                     st.markdown('<p class="section-title">📊 Distribusi Probabilitas Prediksi</p>', unsafe_allow_html=True)
                     
                     prob_mean = np.mean(probabilities)
@@ -957,7 +852,7 @@ with tab2:
                     else:
                         st.warning(f"Model kurang yakin (rata-rata probabilitas {prob_mean * 100:.1f}%)")
 
-                    # Histogram
+                   
                     fig, ax = plt.subplots(figsize=(10, 4))
                     ax.hist(probabilities, bins=20, color='#667eea', edgecolor='black', alpha=0.7)
                     ax.axvline(prob_mean, color='red', linestyle='--', label=f'Rata-rata: {prob_mean:.3f}')
@@ -969,9 +864,7 @@ with tab2:
                     st.pyplot(fig)
                     plt.close()
 
-                    # ========================================
-                    # 5. PERBANDINGAN POLA FAKTOR DOMINAN
-                    # ========================================
+               
                     st.markdown('<p class="section-title">📊 Perbandingan Pola Faktor Dominan (Rata-rata per Fitur)</p>', unsafe_allow_html=True)
                     
                     feature_importance_publik = pd.DataFrame({
@@ -985,23 +878,21 @@ with tab2:
                         'importance': mean_attr_privat / mean_attr_privat.sum()
                     })
                     
-                    # Top 5 Publik
+                  
                     top5_publik = feature_importance_publik.nlargest(5, 'importance')
                     st.markdown("**Top 5 Fitur Dominan - Dataset Publik:**")
                     for _, row in top5_publik.iterrows():
                         label = format_attribute_name(row['feature'])
                         st.write(f"• {label}: {row['importance']:.4f}")
                     
-                    # Top 5 Privat
+                   
                     top5_privat = feature_importance_privat.nlargest(5, 'importance')
                     st.markdown("**Top 5 Fitur Dominan - Dataset Privat:**")
                     for _, row in top5_privat.iterrows():
                         label = format_attribute_name(row['feature'])
                         st.write(f"• {label}: {row['importance']:.4f}")
 
-                    # ========================================
-                    # 6. KONTRIBUSI PER KELOMPOK
-                    # ========================================
+                    
                     st.markdown("**Kontribusi per Kelompok (Rata-rata per Fitur):**")
                     
                     soft_avg_publik = feature_importance_publik[feature_importance_publik['feature'].isin(soft_attrs)]['importance'].mean()
@@ -1031,7 +922,7 @@ with tab2:
                     
                     st.dataframe(comp_df.round(2), use_container_width=True)
 
-                    # Bar chart
+                  
                     fig, ax = plt.subplots(figsize=(10, 5))
                     x = np.arange(len(comp_df['Kelompok']))
                     width = 0.35
@@ -1052,9 +943,7 @@ with tab2:
                     st.pyplot(fig)
                     plt.close()
 
-                    # ========================================
-                    # 7. INTERPRETASI PERBEDAAN POLA
-                    # ========================================
+                    
                     st.markdown("**Interpretasi Perbedaan Pola Faktor Dominan:**")
                     
                     if soft_avg_publik > life_avg_publik and soft_avg_publik > tech_avg_publik:
@@ -1079,9 +968,7 @@ with tab2:
                     else:
                         st.warning(f"⚠️ Pola dominan berbeda: Publik ({dominan_publik}) vs Privat ({dominan_privat}).")
 
-                    # ========================================
-                    # 8. ANALISIS STATISTIK DESKRIPTIF
-                    # ========================================
+                    
                     st.markdown('<p class="section-title">📊 Analisis Statistik Deskriptif</p>', unsafe_allow_html=True)
                     
                     soft_data = df_batch[soft_attrs].values.flatten()
@@ -1103,9 +990,7 @@ with tab2:
                     for _, row in stats_df.iterrows():
                         st.write(f"• {row['Kelompok']}: rata-rata {row['Mean']:.2f} (std {row['Std Dev']:.2f}, min {row['Min']:.0f}, max {row['Max']:.0f})")
 
-                    # ========================================
-                    # 9. DETAIL HASIL PREDIKSI
-                    # ========================================
+                 
                     st.markdown('<p class="section-title">📋 Detail Hasil Prediksi</p>', unsafe_allow_html=True)
                     
                     columns_to_show = []
@@ -1121,9 +1006,7 @@ with tab2:
                     
                     st.dataframe(df_batch[columns_to_show], use_container_width=True)
 
-                    # ========================================
-                    # DOWNLOAD HASIL
-                    # ========================================
+              
                     output = BytesIO()
                     with pd.ExcelWriter(output, engine='openpyxl') as writer:
                         df_batch.to_excel(writer, sheet_name='Hasil Prediksi', index=False)
@@ -1140,9 +1023,7 @@ with tab2:
             st.error(f"Error membaca file: {e}")
 
 
-# ============================================================
-# FOOTER
-# ============================================================
+
 
 st.markdown("""
 <div class="footer">
